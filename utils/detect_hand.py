@@ -15,7 +15,7 @@ cfg.SOLVER.BASE_LR = 0.00025
 cfg.SOLVER.MAX_ITER = 300
 cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-cfg.MODEL.WEIGHTS = "/home/alena/Documents/HoldTheToad-REFORGED/data/models/model_final.pth"
+cfg.MODEL.WEIGHTS = "data/models/model_final.pth"
 cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7
 cfg.MODEL.DEVICE = "cpu"
 
