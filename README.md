@@ -2,7 +2,7 @@
 
 - [x] Data
 - [x] Train model
-- [ ] Detect hand on photo
+- [x] Detect hand on photo
 - [ ] Prepare toad image for the photo (color/brightness correction)
 - [ ] Add a toad
 - [ ] Tg bot
