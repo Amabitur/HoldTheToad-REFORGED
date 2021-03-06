@@ -40,28 +40,31 @@ def draw_toad(image, boxes, toad):
         xmin, ymin, xmax, ymax = box
         toad = correct_toad_color(image[ymin:ymax, xmin:xmax], toad)
         cv2.imwrite("hand.jpg", image[ymin:ymax, xmin:xmax])
-        perc0 = min(xmax - xmin, ymax - ymin) / max(toad.shape)
+        perc0 = 0.75*min(xmax - xmin, ymax - ymin) / max(toad.shape)
         w0 = int(toad.shape[1] * perc0)
         h0 = int(toad.shape[0] * perc0)
         toad = cv2.resize(toad, (w0, h0))
         pilimg = Image.fromarray(image)
         piltoad = Image.fromarray(toad)
-        pilimg.paste(piltoad, (xmin, ymin + (ymax - ymin) // 3), piltoad)
+        pilimg.paste(piltoad, (xmin, ymin + (ymax - ymin) // 4), piltoad)
         image = np.array(pilimg)
     return image
 
 
-def correct_toad_color(image, toad):
-    pre_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    pre_toad = cv2.cvtColor(toad[:, :, 0:3], cv2.COLOR_BGR2HSV)
+def correct_toad_color(hand, toad):
+    pre_hand = cv2.cvtColor(hand.copy(), cv2.COLOR_BGR2HSV)
+    pre_toad = cv2.cvtColor(toad[:, :, 0:3].copy(), cv2.COLOR_BGR2HSV)
+    satur_coef = pre_toad[:, :, 1].mean()/pre_hand[:, :, 1].mean()
 
-    pre_toad[:, :, 1] = pre_image[:, :, 1].mean()  # pre_toad[:, :, 2]/v_coef
+    pre_toad[:, :, 1] = pre_toad[:, :, 1]/satur_coef
     new_toad = cv2.cvtColor(np.uint8(pre_toad), cv2.COLOR_HSV2BGR)
 
-    new_toad_alpha = toad
+    new_toad_alpha = toad.copy()
     new_toad_alpha[:, :, 0] = new_toad[:, :, 0]
     new_toad_alpha[:, :, 1] = new_toad[:, :, 1]
     new_toad_alpha[:, :, 2] = new_toad[:, :, 2]
+
+    return new_toad_alpha
 
     return new_toad_alpha
 
