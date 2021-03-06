@@ -1,5 +1,6 @@
 /data/
-/notebooks/
 /toad_venv/
-/config/
-/toad_img.jpg
+/config/config.py
+/tmp/
+*.jpg
+*.ipynb

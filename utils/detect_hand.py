@@ -1,7 +1,6 @@
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.engine import DefaultPredictor
-import os
 import cv2
 import numpy as np
 from PIL import Image
@@ -16,7 +15,7 @@ cfg.SOLVER.MAX_ITER = 300
 cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
 cfg.MODEL.WEIGHTS = "data/models/model_final.pth"
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7
+cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.2
 cfg.MODEL.DEVICE = "cpu"
 
 predictor = DefaultPredictor(cfg)
@@ -24,6 +23,7 @@ predictor = DefaultPredictor(cfg)
 
 def get_hand_prediction(image):
     outputs = predictor(image)
+    print(outputs)
     boxes = outputs['instances'].pred_boxes
     return boxes.tensor.numpy().astype(int)
 
@@ -34,24 +34,42 @@ def draw_boxes(image, boxes):
         image = cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
     return image
 
+
 def draw_toad(image, boxes, toad):
     for box in boxes:
         xmin, ymin, xmax, ymax = box
-        perc0 = min(xmax-xmin, ymax-ymin) / max(toad.shape)
+        toad = correct_toad_color(image[ymin:ymax, xmin:xmax], toad)
+        cv2.imwrite("hand.jpg", image[ymin:ymax, xmin:xmax])
+        perc0 = min(xmax - xmin, ymax - ymin) / max(toad.shape)
         w0 = int(toad.shape[1] * perc0)
         h0 = int(toad.shape[0] * perc0)
         toad = cv2.resize(toad, (w0, h0))
         pilimg = Image.fromarray(image)
         piltoad = Image.fromarray(toad)
-        pilimg.paste(piltoad, (xmin, (ymin+ymax)//4), piltoad)
+        pilimg.paste(piltoad, (xmin, ymin + (ymax - ymin) // 3), piltoad)
         image = np.array(pilimg)
     return image
 
 
-image = cv2.imread("data/hands/Human-Hands-Front-Back.jpg")
-toad = cv2.imread("data/toads/toad1.png", cv2.IMREAD_UNCHANGED)
+def correct_toad_color(image, toad):
+    pre_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    pre_toad = cv2.cvtColor(toad[:, :, 0:3], cv2.COLOR_BGR2HSV)
 
-boxes = get_hand_prediction(image)
-img = draw_boxes(image, boxes)
-img = draw_toad(img, boxes, toad)
-cv2.imwrite("toad_img.jpg", img)
+    pre_toad[:, :, 1] = pre_image[:, :, 1].mean()  # pre_toad[:, :, 2]/v_coef
+    new_toad = cv2.cvtColor(np.uint8(pre_toad), cv2.COLOR_HSV2BGR)
+
+    new_toad_alpha = toad
+    new_toad_alpha[:, :, 0] = new_toad[:, :, 0]
+    new_toad_alpha[:, :, 1] = new_toad[:, :, 1]
+    new_toad_alpha[:, :, 2] = new_toad[:, :, 2]
+
+    return new_toad_alpha
+
+
+def predict_and_draw(image, toad):
+    boxes = get_hand_prediction(image)[:1]
+    print(boxes)
+    print(len(boxes))
+    # img = draw_boxes(image, boxes)
+    img = draw_toad(image, boxes, toad)
+    return img, len(boxes)

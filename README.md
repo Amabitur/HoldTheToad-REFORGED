@@ -3,12 +3,10 @@
 - [x] Data
 - [x] Train model
 - [x] Detect hand on photo
-- [ ] Prepare toad image for the photo (color/brightness correction)
-- [ ] Add a toad
-- [ ] Tg bot
+- [x] Prepare toad image for the photo (color/brightness correction)
+- [x] Add a toad
+- [x] Tg bot
 
-## Dataset
-https://github.com/SubhiH/HandsDataset
+[Dataset](https://github.com/SubhiH/HandsDataset)
 
-## Colab with training
-https://colab.research.google.com/drive/15qtcSWtzulIz2ghbpqX-wKo9bea9CcRK?usp=sharing
+[Colab with training](https://colab.research.google.com/drive/15qtcSWtzulIz2ghbpqX-wKo9bea9CcRK?usp=sharing)
