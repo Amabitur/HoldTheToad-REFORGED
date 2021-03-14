@@ -33,8 +33,8 @@ def get_image_id_from_message(message):
 
 def image_processing(image_name):
     image_np = cv2.imread('./tmp/' + image_name)
-    toad = cv2.imread('./data/toads/' + np.random.choice(os.listdir('./data/toads/')), cv2.IMREAD_UNCHANGED)
-    best_image, num_boxes = detect_hand.predict_and_draw(image_np, toad)
+    #toad = cv2.imread('./data/toads/' + np.random.choice(os.listdir('./data/toads/')), cv2.IMREAD_UNCHANGED)
+    best_image, num_boxes = detect_hand.predict_and_draw(image_np)
     cv2.imwrite(image_name, best_image)
     return num_boxes
 
@@ -56,7 +56,7 @@ def get_photo_message(message):
     img_name = save_image(message)
     num_boxes = image_processing(img_name)
     if num_boxes == 0:
-        bot.send_message(message.from_user.id, "Хмммм, не получилось задетектировать ладонь. Может, отправишь ещё одно фото или исправить освещение?")
+        bot.send_message(message.from_user.id, "Хмммм, не получилось задетектировать ладонь. Может, отправишь ещё одно фото или поправишь освещение?")
     else:
         bot.send_photo(message.chat.id, open(img_name, 'rb'))
 
